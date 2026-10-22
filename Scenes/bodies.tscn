@@ -35,12 +35,22 @@ resource_name = "capsule_character"
 script/source = "extends CharacterBody3D
 
 # Hello programmer!!!!!
-# Pls change this to be an export variable!!!
+# Pls change these to be an export variables!!!
 var kick_force: int = 2
+var mouse_sens: float = 0.01
 
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
 
+# Refrences
+@export var camera_holder: Node3D
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		camera_holder.rotate_y(-event.relative.x * mouse_sens)
+
+func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _physics_process(delta: float) -> void:
 	# Add the gravity.
@@ -53,8 +63,8 @@ func _physics_process(delta: float) -> void:
 
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
-	var input_dir := Input.get_vector(\"ui_left\", \"ui_right\", \"ui_up\", \"ui_down\")
-	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+	var input_dir := Input.get_vector(\"ui_up\", \"ui_down\", \"ui_right\", \"ui_left\")
+	var direction := (camera_holder.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	if direction:
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
@@ -176,17 +186,20 @@ mesh = SubResource("BoxMesh_uuy4b")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=158281696]
 transform = Transform3D(1, 0, 0, 0, 0.47180453, 0.8817032, 0, -0.8817032, 0.47180453, 0, 1.7585849, 0.3829584)
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1864291634]
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1864291634 node_paths=PackedStringArray("camera_holder")]
 transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 2.791, 1.221, 0)
 axis_lock_angular_x = true
 axis_lock_angular_z = true
 script = SubResource("GDScript_l16ms")
-
-[node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1272397794]
-transform = Transform3D(1, 0, 0, 0, 0.7749445, 0.6320293, 0, -0.6320293, 0.7749445, 0, 1.2208863, 1.207238)
+camera_holder = NodePath("CameraHolder")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D" unique_id=1180379098]
 mesh = SubResource("CapsuleMesh_l16ms")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1877597708]
 shape = SubResource("CapsuleShape3D_l16ms")
+
+[node name="CameraHolder" type="Node3D" parent="CharacterBody3D" unique_id=1459686708]
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/CameraHolder" unique_id=1272397794]
+transform = Transform3D(1, 0, 0, 0, 0.7749445, 0.6320293, 0, -0.6320293, 0.7749445, 0, 1.2208865, 1.207238)
